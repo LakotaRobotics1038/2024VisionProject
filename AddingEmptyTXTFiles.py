@@ -3,11 +3,38 @@ import os
 
 
 def makeTxtFiles():
+    
     #this funtion creates .txt files for all images that don't contian a label
-    path = # todo make relitive path
 
-    os.remove("toDo path\train.txt")
-    file = open("toDo path\train.txt")
+    
+    path = os.path.join("..","2024VisionProject","aprilTags","pictures")
+    for folder in os.listdir(path):
+        folderPath = os.path.join(path, folder)
+        for imgList in os.listdir(folderPath):
+            
+    
+
+makeTxtFiles()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""#os.remove(path)
+    file = (path)
 
     dirList = os.listdir(path)
     file.write("files and directories in "+path+":")
@@ -17,8 +44,17 @@ def makeTxtFiles():
         innerList = os.listdir(innerPath)
 
         for item in innerList:
-            file.write(f"{innerPath}{item}\n")
+            file.write("{innerPath}{item}\\n")
 
+    Name = fileName
+    tempName = fileName - ".jpg"
+    for each in dirList:
+        if tempName == tempName + ".txt":
+            #something that makes this move on
+            return 
+        else:
+            open(tempName.txt, x)
     file.close()
 
-    makeTxtFiles()
+    makeTxtFiles()"""
+   
