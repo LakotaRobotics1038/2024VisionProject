@@ -11,8 +11,17 @@ def makeTxtFiles():
     for folder in os.listdir(path):
         folderPath = os.path.join(path, folder)
         for imgList in os.listdir(folderPath):
-            
-    
+            isThere = False
+            if imgList.endswith(".jpg"):
+                tempFileName = imgList.replace(".jpg", ".txt")
+                for newImgList in os.listdir(folderPath):
+                    if newImgList == tempFileName:
+                        isThere = True
+                if isThere == False:
+                    filePath = os.path.join(folderPath, tempFileName)
+                    newTXTFile = open(filePath, "a")
+                    print(filePath)
+                    newTXTFile.close()
 
 makeTxtFiles()
 
