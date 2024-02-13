@@ -101,7 +101,7 @@ def process(image): #makes emty lsits and appends them to put nessisary data tog
                         'x': str(center_x),
                         'y': str(center_y),
                         'conf': str(confidence),
-                        'area' = str(w * h)
+                        'area': str(w * h)
                     })
 
 indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
