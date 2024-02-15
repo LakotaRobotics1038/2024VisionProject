@@ -52,7 +52,7 @@ def get_image():
         yeild (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n'
 
 def record_cam:
-    isReacording = False
+    isRecording = False
 
     while True:
         ct = datetime.now()

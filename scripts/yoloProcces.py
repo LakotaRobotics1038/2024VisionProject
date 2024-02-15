@@ -6,8 +6,8 @@ import time
 import os
 
 conf_threshold = 0.6
-nms_threshold = 0.8
-inf_thresh = 50
+nms_threshold = 0.8 # non maximal supresstion = nms
+inf_thresh = 50 #inferance = inf
 pixToll = 25
 
 net = cv2.dnn.readNetFromDarknet('../mk1/yoloCon-tiny-mk1.cfg', '../mk1/backup/yoloCon-tiny-mk1_last.weights')
@@ -101,7 +101,7 @@ def process(image): #makes emty lsits and appends them to put nessisary data tog
                         'x': str(center_x),
                         'y': str(center_y),
                         'conf': str(confidence),
-                        'area' = str(w * h)
+                        'area': str(w * h)
                     })
 
 indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
