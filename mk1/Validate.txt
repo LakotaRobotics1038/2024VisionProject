@@ -1,0 +1,71 @@
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240214_14_28_23_Pro (4).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_31_04_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240214_14_26_54_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_28_54_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_31_59_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_39_05_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_30_13_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240214_14_27_25_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_26_15_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_44_39_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_38_40_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_33_33_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_33_23_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_29_24_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_32_59_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_32_05_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_41_38_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_33_14_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_25_32_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_44_29_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_30_49_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240214_14_27_04_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_25_52_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_42_40_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_30_08_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_29_59_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_43_55_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_33_59_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_31_08_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_45_05_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_28_45_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_38_05_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_33_48_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_25_20_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240214_14_28_35_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_39_31_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_33_21_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_31_02_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_33_16_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240214_14_28_35_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_26_11_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_32_54_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240214_14_28_08_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_45_18_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_29_18_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_30_01_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_30_08_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_31_59_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_26_14_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_25_50_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240214_14_28_23_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_26_11_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_38_42_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_38_20_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_25_51_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_28_19_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_45_16_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240214_14_28_20_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_40_41_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_26_46_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_32_03_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_40_08_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240214_14_28_34_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_39_36_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_43_57_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_26_09_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_33_56_Pro (2).jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_29_22_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_33_23_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_19_25_45_Pro.jpg
+/home/jetson/workspace/2024VisionProject/BetterData/WIN_20240213_18_40_07_Pro.jpg
