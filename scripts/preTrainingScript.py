@@ -46,6 +46,6 @@ mk1.write("train = " + Path + "/Train.txt" + "\n")
 mk1.write("validate = " + Path + "/Validate.txt" + "\n")
 mk1.write("test = " + Path + "/Test.txt" + "\n")
 mk1.write("backup = " + Path + "/backup")
-mk1.close
+mk1.close()
 
 print("done")
