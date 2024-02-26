@@ -64,7 +64,7 @@ mk1.write("train = " + os.path.join(args.path,"Train.txt") + "\n")
 mk1.write("validate = " + os.path.join(args.path, "Validate.txt") + "\n")
 mk1.write("test = " + os.path.join(args.path, "Test.txt") + "\n")
 mk1.write("backup = " + os.path.join(args.path, "backup"))
-mk1.write("names = " + os.join.path(os.join.expanduser('~'), 'workspace', '2024VisonProject', 'mk1', 'ApLabels.txt')
+mk1.write("names = " + os.join.path(os.join.expanduser('~'), 'workspace', '2024VisonProject', 'mk1', 'ApLabels.txt'))
 mk1.close()
 
 print("done")
