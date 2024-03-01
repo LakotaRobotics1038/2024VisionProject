@@ -5,17 +5,17 @@ import cv2
 import time
 import os
 
-conf_threshold = 0.6
-nms_threshold = 0.8 # non maximal supresstion = nms
+conf_threshold = 0.1
+nms_threshold = 0.8 # non maximal supression = nms
 inf_thresh = 50 #inferance = inf
 pixToll = 25
 
-net = cv2.dnn.readNetFromDarknet('../mk1/yoloCon-tiny-mk1.cfg', '../mk1/backup/yoloCon-tiny-mk1_last.weights')
+net = cv2.dnn.readNetFromDarknet('../mk1/cfgs/yolov7TinyVersion.cfg', '../mk1/backup/yolov7TinyVersion_best.weights')
 scale = 1.0 / 255.0
 classes = None
 
 
-with open('../mk1/labels.txt', 'r') as f:
+with open('../mk1/ApLabels.txt', 'r') as f:
     classes = [line.strip() for line in f.readlines()]
 
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
@@ -58,11 +58,11 @@ def getBetterObj(ID, xBox, yBox, conf, ids, boxes, confs): #chooses the better b
     return ret
         
 
-def process(image): #makes emty lsits and appends them to put nessisary data together
+def process(image): #makes empty lists and appends them to put necessary data together
     
     Width = image.shape[1]
     Height = image.shape[0]
-    blob = cv2.dnn.blobFromImage(image, scale, (416, 416), (0, 0, 0), True, crop = False)
+    blob = cv2.dnn.blobFromImage(image, scale, (128, 128), (0, 0, 0), True, crop = False)
     net.setInput(blob)
     
     outs = net.forward(get_output(net)) #check with connor on this line
@@ -104,24 +104,23 @@ def process(image): #makes emty lsits and appends them to put nessisary data tog
                         'area': str(w * h)
                     })
 
-indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
+    indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
 
-for i in indices:
+    for i in indices:
 
-    box = boxes[i]
+        box = boxes[i]
 
-    x = box[0]
+        x = box[0]
 
-    y = box[1]
+        y = box[1]
 
-    w = box[2]
+        w = box[2]
 
-    h = box[3]
-
-
-    draw_bounding_box(image, class_ids[i], confidences[i], round(x), round(y), round(x+w), round(y+h))
+        h = box[3]
 
 
-return image, dataOut
+        draw_bounding_box(image, class_ids[i], confidences[i], round(x), round(y), round(x+w), round(y+h))
+
+    return image, dataOut, draw_bounding_box
 
         

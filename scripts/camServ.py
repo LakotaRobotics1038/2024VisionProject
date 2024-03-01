@@ -1,37 +1,42 @@
 
 from flask import Flask, Response
 import cv2
-from yoloProcess import process
-from networktables import NetworkTabels
+from yoloProcces import process, draw_bounding_box
+from networktables import NetworkTables
 from datetime import datetime
 import threading
 import json
 import os
 
 # declares cameras and sets our server address
-app = Flask(__name__)#ask connor about
+app = Flask(__name__)
 cam0 = cv2.VideoCapture(0)
 cam1 = cv2.VideoCapture(1)
 serverAddr = '10.10.38.2'
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-NetworkTables.initailize(server=severAddr)
+NetworkTables.initialize(server=serverAddr)
 #gets custom table
-tables = Networktables.getTable('Vision')
-fmsTable = NetworkTables('FMSInfo')
+tables = NetworkTables.getTable('Vision')
+fmsTable = NetworkTables.getTable('FMSInfo')
 
 def run_network():
     while True:
-        on0 = tables.getBoolean('on0',False)#setting camera states to off/false
+        on0 = tables.getBoolean('on0', True)#False)#setting camera states to off/false
         on1 = tables.getBoolean('on1', False)
         ret = False
+        print('true')
         if on0:
             ret, img = cam0.read()
+            print('on0')
         elif on1:
             ret, img = cam1.read()
+            print('on1')
         if ret:
-            img, vals = procces(img)
+            vals = process(img)
+            #img, vals = process(img)
             print(vals)
+            print('after Vals')
             tables.putString('values', json.dumps(vals)) #converting data from vison into a json string
 
 def get_image():
@@ -40,24 +45,26 @@ def get_image():
     # default port for network tables = 1735
 
     while True:
-        shouldStream0 = tables.getboolean('shoudlStream0', True)
+        shouldStream0 = tables.getBoolean('shouldStream0', True)
 
-        if (shouldstream0):
+        if (shouldStream0):
             ret, img = cam0.read()
         else:
             ret, img = cam1.read()
+       # print(img.shape[0])
+       # print(img.shape[1])
 
-        img = cv2.resize(img. (160, 120))#why (160, 120), shoudl we resize to the saem thing we do in the model?
-        _, frame = cv2.imcode('jpg', img) #what is the underscore for??
-        yeild (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n'
+        #img = cv2.resize(img, (160, 120))#why (160, 120), shoudl we resize to the saem thing we do in the model?
+        _, frame = cv2.imencode('.jpg', img) #what is the underscore for??
+        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
 
-def record_cam:
+def record_cam():
     isRecording = False
 
     while True:
         ct = datetime.now()
 
-        shouldrecord = tables.getBoolean('recording', false)
+        shouldRecord = tables.getBoolean('recording', False)
         if shouldRecord:
             ret0, img0 = cam0.read()
             ret1, img1 = cam1.read()
@@ -87,7 +94,7 @@ def stream0():
     return Response(get_image(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 recordingThread = threading.Thread(target=record_cam)
-visionThread = threading.Thread(targer=run_network)
+visionThread = threading.Thread(target=run_network)
 visionThread.start()
 recordingThread.start()
 app.run(host='0.0.0.0', port = 1180, threaded=True)
