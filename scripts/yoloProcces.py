@@ -5,7 +5,7 @@ import cv2
 import time
 import os
 
-conf_threshold = 0.1
+conf_threshold = 0.9
 nms_threshold = 0.8 # non maximal supression = nms
 inf_thresh = 50 #inferance = inf
 pixToll = 25
@@ -79,7 +79,7 @@ def process(image): #makes empty lists and appends them to put necessary data to
     for out in outs:
         for detection in out:
 
-            scores = detection[5:]
+            scores = detection[0:5]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
             
@@ -121,6 +121,6 @@ def process(image): #makes empty lists and appends them to put necessary data to
 
         draw_bounding_box(image, class_ids[i], confidences[i], round(x), round(y), round(x+w), round(y+h))
 
-    return image, dataOut, draw_bounding_box
+    return image, dataOut
 
         
