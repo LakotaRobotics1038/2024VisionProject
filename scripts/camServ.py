@@ -38,7 +38,8 @@ def get_image():
         else:
             ret, img = cam1.read()
         
-        img = cv2.resize(img, (640, 360))
+        
+        img = cv2.resize(img, (0, 0), fx = 0.33, fy = 0.33)
         # Converts (encodes) image formats into streaming data and stores it in-memory cache.
         frame = cv2.imencode('.jpg', img)[1]
 
@@ -96,7 +97,7 @@ def run_network():
         elif on1:
             ret, img = cam1.read()
 
-        if ret:
+        '''if ret:
             print('time to process images.')
             img, vals = process(img)
 
@@ -105,7 +106,7 @@ def run_network():
 
             tables.putString('values', vals)
 
-            print(tables)
+            print(tables)'''
 
             
             
