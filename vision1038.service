@@ -1,0 +1,13 @@
+[Unit]
+Description=1038 Vision Processing and Camera Stream
+After=multi-user.target
+
+[Service]
+User=team1038
+Type=simple
+WorkingDirectory=/home/team1038/workspace/2024VisionProject/scripts
+ExecStart=/usr/bin/python3.11 /home/team1038/workspace/2024VisionProject/scripts/camStreamOnly.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
