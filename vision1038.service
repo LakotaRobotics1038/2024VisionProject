@@ -3,10 +3,10 @@ Description=1038 Vision Processing and Camera Stream
 After=multi-user.target
 
 [Service]
-User=team1038
+User=jetson
 Type=simple
 WorkingDirectory=/home/team1038/workspace/2024VisionProject/scripts
-ExecStart=/usr/bin/python3.11 /home/team1038/workspace/2024VisionProject/scripts/camStreamOnly.py
+ExecStart=/usr/bin/python3.8 /home/team1038/workspace/2024VisionProject/scripts/camStreamOnly.py
 Restart=on-abort
 
 [Install]
