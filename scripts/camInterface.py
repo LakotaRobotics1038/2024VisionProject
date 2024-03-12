@@ -21,7 +21,7 @@ while running:
 
     elif key == ord('n'):
         runCam = False
-        app.stop(host='0.0.0.0', port = 1180, threaded=true)
+        app.stop(host='0.0.0.0', port = 1180, threaded=True)
 
     elif key == ord('q'):
         running = False

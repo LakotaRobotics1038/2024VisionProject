@@ -30,7 +30,7 @@ def run_network():
         elif on1:
             ret, img = cam1.read()
         if ret:
-            img, vals = procces(img)
+            img, vals = process(img)
             print(vals)
             tables.putString('values', json.dumps(vals)) #converting data from vison into a json string
 
