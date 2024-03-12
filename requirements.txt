@@ -1,0 +1,4 @@
+flask
+pynetworktables
+numpy
+opencv-python

@@ -2,6 +2,9 @@
 import cv2
 import camServ
 import time
+from flask import Flask
+
+app = Flask(__name__)
 
 runCam = False
 running = False
@@ -25,5 +28,6 @@ while running:
 
     endTime = time.time()
 
-camera.stop()
+# Dunno why this is here?  BWH
+# camera.stop()
   

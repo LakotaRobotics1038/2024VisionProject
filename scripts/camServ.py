@@ -2,22 +2,22 @@
 from flask import Flask, Response
 import cv2
 from yoloProcess import process
-from networktables import NetworkTabels
+from networktables import NetworkTables
 from datetime import datetime
 import threading
 import json
 import os
 
 # declares cameras and sets our server address
-app = Flask(__name__)#ask connor about
+app = Flask(__name__)#ask connor about - BWH This is just a flask-ism for starting a server 
 cam0 = cv2.VideoCapture(0)
 cam1 = cv2.VideoCapture(1)
 serverAddr = '10.10.38.2'
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-NetworkTables.initailize(server=severAddr)
+NetworkTables.initailize(server=serverAddr)
 #gets custom table
-tables = Networktables.getTable('Vision')
+tables = NetworkTables.getTable('Vision')
 fmsTable = NetworkTables('FMSInfo')
 
 def run_network():
@@ -42,22 +42,22 @@ def get_image():
     while True:
         shouldStream0 = tables.getboolean('shoudlStream0', True)
 
-        if (shouldstream0):
+        if (shouldStream0):
             ret, img = cam0.read()
         else:
             ret, img = cam1.read()
 
-        img = cv2.resize(img. (160, 120))#why (160, 120), shoudl we resize to the saem thing we do in the model?
+        img = cv2.resize(img, (160, 120))#why (160, 120), shoudl we resize to the saem thing we do in the model?
         _, frame = cv2.imcode('jpg', img) #what is the underscore for??
-        yeild (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n'
+        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
 
-def record_cam:
+def record_cam():
     isRecording = False
-
+    
     while True:
         ct = datetime.now()
 
-        shouldrecord = tables.getBoolean('recording', false)
+        shouldRecord = tables.getBoolean('recording', False)
         if shouldRecord:
             ret0, img0 = cam0.read()
             ret1, img1 = cam1.read()
