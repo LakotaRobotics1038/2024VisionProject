@@ -1,0 +1,13 @@
+[Unit]
+Description=1038 Vision Processing and Camera Stream
+After=multi-user.target
+
+[Service]
+User=jetson
+Type=simple
+WorkingDirectory=/home/jetson/workspace/2024VisionProject/scripts
+ExecStart=/usr/bin/python3.8 /home/jetson/workspace/2024VisionProject/scripts/quickVision/camServ.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
