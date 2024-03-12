@@ -1,7 +1,7 @@
 
 from flask import Flask, Response
 import cv2
-from yoloProcess import process
+import apriltag
 from networktables import NetworkTables
 from datetime import datetime
 import threading
@@ -18,11 +18,25 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 NetworkTables.initialize(server=serverAddr)
 #gets custom table
 tables = NetworkTables.getTable('Vision')
-fmsTable = NetworkTables('FMSInfo')
+fmsTable = NetworkTables.getTable('FMSInfo')
 
 def run_network():
     while True:
-        on0 = tables.getBoolean('on0',False)#setting camera states to off/false
+        detector = options = apriltag.DetectorOptions(families='tag36h11',
+                                 border=1,
+                                 nthreads=4,
+                                 quad_decimate=1.0,
+                                 quad_blur=0.0,
+                                 refine_edges=True,
+                                 refine_decode=False,
+                                 refine_pose=False,
+                                 debug=False,
+                                 quad_contours=True)
+        
+        detector = apriltag.Detector(options)
+        
+
+        on0 = tables.getBoolean('on0', False)#setting camera states to off/false
         on1 = tables.getBoolean('on1', False)
         ret = False
         if on0:
@@ -30,9 +44,10 @@ def run_network():
         elif on1:
             ret, img = cam1.read()
         if ret:
-            img, vals = process(img)
-            print(vals)
-            tables.putString('values', json.dumps(vals)) #converting data from vison into a json string
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            result = detector.detect(gray)
+            print(result)
+            tables.putString('values', json.dumps(result)) #converting data from vison into a json string
 
 def get_image():
     ret, img = cam1.read()
