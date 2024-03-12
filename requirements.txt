@@ -1,0 +1,6 @@
+flask
+pynetworktables
+numpy
+opencv-python
+Pillow
+apriltag

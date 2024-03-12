@@ -103,25 +103,15 @@ def process(image): #makes emty lsits and appends them to put nessisary data tog
                         'conf': str(confidence),
                         'area': str(w * h)
                     })
+    indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
 
-indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
-
-for i in indices:
-
-    box = boxes[i]
-
-    x = box[0]
-
-    y = box[1]
-
-    w = box[2]
-
-    h = box[3]
-
-
-    draw_bounding_box(image, class_ids[i], confidences[i], round(x), round(y), round(x+w), round(y+h))
-
-
-return image, dataOut
+    for i in indices:
+        box = boxes[i]
+        x = box[0]
+        y = box[1]
+        w = box[2]
+        h = box[3]
+        draw_bounding_box(image, class_ids[i], confidences[i], round(x), round(y), round(x+w), round(y+h))
+    return image, dataOut
 
         
