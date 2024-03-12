@@ -1,69 +1,70 @@
 import cv2
 import numpy as np
 
-def find_largest_orange_circle(frame):
-    # Convert the frame to HSV (Hue, Saturation, Value) color space
+# Callback function for trackbar changes
+def on_trackbar(val):
+    pass
+
+# Function to detect orange areas based on trackbar values
+def detect_orange_areas(frame, lower_orange, upper_orange):
+    # Convert the frame to HSV color space
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    
-    # Define the range of orange color in HSV
-    lower_orange = np.array([5, 50, 50])
-    upper_orange = np.array([15, 255, 255])
 
     # Threshold the HSV image to get only orange colors
     mask = cv2.inRange(hsv, lower_orange, upper_orange)
 
-    # Find contours in the mask
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    largest_circle = None
-    max_radius = 0
-    
-    # Iterate through all contours to find the largest round shape
-    for contour in contours:
-        area = cv2.contourArea(contour)
-        perimeter = cv2.arcLength(contour, True)
-        circularity = 4 * np.pi * area / (perimeter * perimeter)
-        
-        # Define circularity threshold
-        circularity_threshold = 0.6
-        
-        if circularity > circularity_threshold:
-            # Fit a circle to the contour
-            (x, y), radius = cv2.minEnclosingCircle(contour)
-            
-            # Convert the radius to integer
-            radius = int(radius)
-            
-            # Check if the contour is the largest circle found so far
-            if radius > max_radius:
-                max_radius = radius
-                largest_circle = (x, y), radius
+    # Apply a series of morphological operations to clean up the mask
+    kernel = np.ones((5, 5), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
-    return largest_circle
+    # Apply the mask to the original frame
+    result = cv2.bitwise_and(frame, frame, mask=mask)
 
-# Open the webcam
+    return result
+
+# Initialize the webcam
 cap = cv2.VideoCapture(0)
 
+# Create a window for the trackbars
+cv2.namedWindow('Trackbars')
+
+# Initialize trackbar values
+lower_orange = np.array([0, 129, 160])
+upper_orange = np.array([15, 198, 255])
+
+# Create trackbars for adjusting HSV color range thresholds
+cv2.createTrackbar('Hue Lower', 'Trackbars', lower_orange[0], 179, on_trackbar)
+cv2.createTrackbar('Saturation Lower', 'Trackbars', lower_orange[1], 255, on_trackbar)
+cv2.createTrackbar('Value Lower', 'Trackbars', lower_orange[2], 255, on_trackbar)
+cv2.createTrackbar('Hue Upper', 'Trackbars', upper_orange[0], 179, on_trackbar)
+cv2.createTrackbar('Saturation Upper', 'Trackbars', upper_orange[1], 255, on_trackbar)
+cv2.createTrackbar('Value Upper', 'Trackbars', upper_orange[2], 255, on_trackbar)
+
 while True:
+    # Capture frame-by-frame
     ret, frame = cap.read()
-    
     if not ret:
         break
+    
+    # Get trackbar values
+    lower_orange[0] = cv2.getTrackbarPos('Hue Lower', 'Trackbars')
+    lower_orange[1] = cv2.getTrackbarPos('Saturation Lower', 'Trackbars')
+    lower_orange[2] = cv2.getTrackbarPos('Value Lower', 'Trackbars')
+    upper_orange[0] = cv2.getTrackbarPos('Hue Upper', 'Trackbars')
+    upper_orange[1] = cv2.getTrackbarPos('Saturation Upper', 'Trackbars')
+    upper_orange[2] = cv2.getTrackbarPos('Value Upper', 'Trackbars')
 
-    # Find the largest orange circle in the frame
-    orange_circle = find_largest_orange_circle(frame)
+    # Detect orange areas based on trackbar values
+    detected_area = detect_orange_areas(frame, lower_orange, upper_orange)
 
-    if orange_circle is not None:
-        # Draw the largest orange circle
-        (x, y), radius = orange_circle
-        cv2.circle(frame, (int(x), int(y)), radius, (0, 255, 255), 2)
-
-    # Display the frame
-    cv2.imshow('Largest Orange Circle', frame)
-
+    # Display the resulting frame
+    cv2.imshow('Detected Orange Areas', detected_area)
+    
+    # Break the loop when 'q' is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-# Release the webcam and close all OpenCV windows
+# Release the webcam and close all windows
 cap.release()
 cv2.destroyAllWindows()
