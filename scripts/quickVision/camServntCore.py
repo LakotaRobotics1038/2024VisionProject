@@ -3,14 +3,16 @@
 # An object of Flask class is our WSGI application.
 from flask import Flask, Response
 import cv2
-from networktables import NetworkTables
+#from networktables import NetworkTables
+import ntcore
 import threading
 from datetime import datetime
 import os
-from yoloProcces import process, draw_bounding_box
-import numpy as np
+import apriltag
+# Flask constructor takes the name of 
+# current module (__name__) as argument.
+app = Flask(__name__)
 
-# Flask constructor takes the name of c
 # declares cameras and set video type
 cam0 = cv2.VideoCapture(0)
 cam1 = cv2.VideoCapture(1) 
@@ -19,8 +21,10 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # declares NetworkTables and set server address and tables
 # default port for network tables = 1735
 serverAddr = '10.10.38.2'
-NetworkTables.initialize(server=serverAddr)
-tables = NetworkTables.getTable('Vision')
+dTable = ntcore.NetworkTableInstance.getDefault()
+tables = dTable.getTable('vision')
+#NetworkTables.initialize(server=serverAddr)
+#tables = NetworkTables.getTable('Vision')
 # fmsTable = NetworkTables.getTable('FMSInfo') #uncomment for competition
 
 
@@ -35,46 +39,15 @@ def get_image():
             ret, img = cam0.read()
         else:
             ret, img = cam1.read()
-        
+
+        if not ret:
+            continue
         
         img = cv2.resize(img, (0, 0), fx = 0.33, fy = 0.33)
         # Converts (encodes) image formats into streaming data and stores it in-memory cache.
         frame = cv2.imencode('.jpg', img)[1]
 
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
-
-def biggestContourI(contours):
-    maxVal = 0
-    maxI = None
-    for i in range(0, len(contours)):
-        if len(contours[i]) > maxVal:
-            maxVal = len(contours[i])
-            maxI = i
-    return maxI
-
-def hsv_Detection(img):
-    
-    lh = 1
-    ls = 122
-    lv = 199
-    hh = 69
-    hs = 255
-    hv = 255
-
-    lower = np.array([lh, ls, lv], dtype = "uint8")
-    higher = np.array([hh, hs, hv], dtype = "uint8")
-    
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    flt = cv2.inRange(hsv, lower, higher)
-    
-    contours0, _ = cv2.findContours(flt, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    # Only draw the biggest one
-    bc = biggestContourI(contours0)
-   
-    
-   
-     
 
 
 # The record_cam() method records images from camera
@@ -117,7 +90,8 @@ def record_cam():
 
 # The run_network() method sets network table with image data
 def run_network():
-    print('running network table ...')
+    print('running ntcore ...')
+    detector = apriltag.Detector()
     while True:
         on0 = tables.getBoolean('on0', True)#change to false for comp 
         on1 = tables.getBoolean('on1', False)
@@ -128,16 +102,17 @@ def run_network():
         elif on1:
             ret, img = cam1.read()
 
-        '''if ret:
+        if ret:
             print('time to process images.')
-            img, vals = process(img)
+            
+            result = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
 
             print(img)
-            print(vals)
+            print(result)
 
-            tables.putString('values', vals)
+            tables.putString('values', result)
 
-            print(tables)'''
+            print(tables)
 
             
             

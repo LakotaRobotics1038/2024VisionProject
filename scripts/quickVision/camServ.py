@@ -36,7 +36,9 @@ def get_image():
             ret, img = cam0.read()
         else:
             ret, img = cam1.read()
-        
+
+        if not ret:
+            continue
         
         img = cv2.resize(img, (0, 0), fx = 0.33, fy = 0.33)
         # Converts (encodes) image formats into streaming data and stores it in-memory cache.
