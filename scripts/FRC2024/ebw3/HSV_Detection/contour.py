@@ -16,13 +16,14 @@ def biggestContourI(contours):
             maxI = i
     return maxI
             
-
-iLowH = 0
-iHighH = 5
-iLowS = 116
-iHighS = 208
-iLowV = 163
-iHighV = 225
+#default hsv values on the right
+# lakota robotic controns room vals = lowH 1 HighH 69 LowS 122 HighS 255 LowV 199 HightV 255
+iLowH = 1#0
+iHighH = 69#5
+iLowS = 122#116
+iHighS = 255#208
+iLowV = 199#163
+iHighV = 255#225
 
 cv2.namedWindow('Control')
 cv2.createTrackbar("LowH", "Control", iLowH, 255, nothing)
@@ -37,12 +38,12 @@ cam = cv2.VideoCapture(0)
 while True:
     ret_val, img = cam.read()
 
-    lh = cv2.getTrackbarPos('LowH', 'Control')
-    ls = cv2.getTrackbarPos('LowS', 'Control')
-    lv = cv2.getTrackbarPos('LowV', 'Control')
-    hh = cv2.getTrackbarPos('HighH', 'Control')
-    hs = cv2.getTrackbarPos('HighS', 'Control')
-    hv = cv2.getTrackbarPos('HighV', 'Control')
+    lh = 1#cv2.getTrackbarPos('LowH', 'Control')
+    ls = 122#cv2.getTrackbarPos('LowS', 'Control')
+    lv = 199#cv2.getTrackbarPos('LowV', 'Control')
+    hh = 69#cv2.getTrackbarPos('HighH', 'Control')
+    hs = 255#cv2.getTrackbarPos('HighS', 'Control')
+    hv = 255#cv2.getTrackbarPos('HighV', 'Control')
 
     lower = np.array([lh, ls, lv], dtype = "uint8")
     higher = np.array([hh, hs, hv], dtype = "uint8")
@@ -54,7 +55,9 @@ while True:
     contours0, hierarchy = cv2.findContours(flt, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Only draw the biggest one
+
     bc = biggestContourI(contours0)
+    print("new contour", contours0[bc])
     cv2.drawContours(img, contours0, bc, (0,255,0), 3)
     
     cv2.imshow('cam', img)

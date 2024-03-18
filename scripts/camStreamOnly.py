@@ -1,3 +1,4 @@
+
 from flask import Flask, Response
 import cv2
 # from networktables import NetworkTables
@@ -35,4 +36,3 @@ def stream():
     return Response(get_image(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 app.run(host='0.0.0.0', port = 1180, threaded=True)
-        
