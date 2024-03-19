@@ -12,6 +12,7 @@ import numpy as np
 
 # Flask constructor takes the name of c
 # declares cameras and set video type
+app = Flask(__name__)
 cam0 = cv2.VideoCapture(0)
 cam1 = cv2.VideoCapture(1) 
 fourcc = cv2.VideoWriter_fourcc(*'XVID') 
