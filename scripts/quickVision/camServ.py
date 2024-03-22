@@ -74,10 +74,31 @@ def hsv_Detection(img):
     contours0, _ = cv2.findContours(flt, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Only draw the biggest one
+  
     bc = biggestContourI(contours0)
-   
-    
-   
+
+    #find avg for total x + y to find center of contour
+    if bc is not None:
+        i=0
+        totalX=0
+        totalY=0
+        for i in range(0,len(contours0[bc])):
+            xyCoord = str(contours0[bc][i])
+
+            firstSpace = xyCoord.index(' ')
+            lastSpace = xyCoord.rfind(' ')
+
+            xCoord = xyCoord[2:firstSpace]
+            yCoord = xyCoord[(lastSpace+1):(len(xyCoord)-2)]
+
+            totalX += int(xCoord)
+            totalY += int(yCoord)
+        
+        avgX = totalX/(i-1)
+        avgY = totalY/(i-1)
+
+
+            
      
 
 
@@ -147,7 +168,7 @@ def run_network():
             valuesPub.set()
             #tables.putString('values', result)
 
-            print(tables)
+            print(visionTable)
     
 
             

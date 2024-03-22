@@ -134,7 +134,7 @@ def run_network():
         elif on1:
             ret, img = cam1.read()
 
-         '''if ret:
+        '''if ret:
             print('time to process images.')
             img, vals = process(img)
 
