@@ -4,7 +4,7 @@
 from flask import Flask, Response
 import cv2
 #from networktables import NetworkTables
-from ntcore import NetworkTableInstance
+import ntcore 
 import threading
 from datetime import datetime
 import os

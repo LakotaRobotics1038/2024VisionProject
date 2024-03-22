@@ -57,7 +57,8 @@ while True:
     # Only draw the biggest one
 
     bc = biggestContourI(contours0)
-    print("new contour", contours0[bc])
+    if(bc != None):
+        print("new contour" + str(contours0[bc][0]))
     cv2.drawContours(img, contours0, bc, (0,255,0), 3)
     
     cv2.imshow('cam', img)
