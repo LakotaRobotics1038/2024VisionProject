@@ -1,18 +1,19 @@
 
+
 # Importing flask module in the project is mandatory
 # An object of Flask class is our WSGI application.
 from flask import Flask, Response
 import cv2
-from networktables import NetworkTables
+import ntcore 
 import threading
 from datetime import datetime
 import os
-import apriltag
-# Flask constructor takes the name of 
-# current module (__name__) as argument.
-app = Flask(__name__)
+import apriltag 
+import numpy as np
 
+# Flask constructor takes the name of c
 # declares cameras and set video type
+app = Flask(__name__)
 cam0 = cv2.VideoCapture(0)
 cam1 = cv2.VideoCapture(1) 
 fourcc = cv2.VideoWriter_fourcc(*'XVID') 
@@ -20,23 +21,23 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # declares NetworkTables and set server address and tables
 # default port for network tables = 1735
 serverAddr = '10.10.38.2'
-NetworkTables.initialize(server=serverAddr)
-tables = NetworkTables.getTable('Vision')
-# fmsTable = NetworkTables.getTable('FMSInfo') #uncomment for competition
-
+instance = ntcore.NetworkTableInstance.getDefault(0)
+visionTable = instance.getTable('vision')
+fmsTable = instance.getTable('FMSInfo') #uncomment for competition
+shouldStream0Sub = visionTable.getBooleanTopic("ShouldStream0").subscribe(True)
 
 # The get_image() method returns image from camera
 def get_image():
     ret, img = cam0.read()
 
     while True:
-        shouldStream0 = tables.getBoolean('shouldStream0', True)
+        shouldStream0 =shouldStream0Sub.get()
 
         if(shouldStream0):
             ret, img = cam0.read()
         else:
             ret, img = cam1.read()
-
+        
         if not ret:
             continue
         
@@ -46,15 +47,50 @@ def get_image():
 
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
 
+def biggestContourI(contours):
+    maxVal = 0
+    maxI = None
+    for i in range(0, len(contours)):
+        if len(contours[i]) > maxVal:
+            maxVal = len(contours[i])
+            maxI = i
+    return maxI
+
+def hsv_Detection(img):
+    
+    lh = 1
+    ls = 122
+    lv = 199
+    hh = 69
+    hs = 255
+    hv = 255
+
+    lower = np.array([lh, ls, lv], dtype = "uint8")
+    higher = np.array([hh, hs, hv], dtype = "uint8")
+    
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    flt = cv2.inRange(hsv, lower, higher)
+    
+    contours0, _ = cv2.findContours(flt, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Only draw the biggest one
+    bc = biggestContourI(contours0)
+   
+    
+   
+     
+
 
 # The record_cam() method records images from camera
 def record_cam():
     print("Recording ...")
     isRecording = False
-
+    shouldRecordSub = visionTable.getBooleanTopic("shouldRecord").subscribe(True)
+    matchIDSub = fmsTable.getIntegerTopic("MatchNumber").subscribe(0)
+    rematchIDSub = fmsTable.getIntegerTopic("ReplayNumber").subscribe(0)
     while True:
         realTime = datetime.now()
-        shouldRecord = tables.getBoolean('recording', False)
+        shouldRecord = shouldRecordSub.get()
 
         if shouldRecord:
             ret0, img0 = cam0.read()
@@ -62,8 +98,8 @@ def record_cam():
 
             if not isRecording:
                 # uncomment following 3 lines for competition
-                #matchID = fmsTable.getNumber('MatchNumber', 0)
-                #rematchID = fmsTable.getNumebr('ReplayNumber', 0)
+                #matchID = matchIDSub.get()
+                #rematchID = rematchIDSub.get()
                 #out = cv2.VideoWriter(str(matchID) + '-' + str(rematchID) + '.avi', fourcc, 60.0, (img.shape[1], img.shape[0]))
                 if ret0:
                     out0 = cv2.VideoWriter(f"{os.path.expanduser('~')}/Videos/{realTime.strftime('%Y-%m-%d at %H-%M-%S')} cam0.avi", fourcc, 15.0, (img0.shape[1], img0.shape[0]))
@@ -89,9 +125,10 @@ def record_cam():
 def run_network():
     print('running network table ...')
     detector = apriltag.Detector()
+    valuesPub= visionTable.getStringTopic("values").publish("[]")
     while True:
-        on0 = tables.getBoolean('on0', True)#change to false for comp 
-        on1 = tables.getBoolean('on1', False)
+        on0 = visionTable.getBoolean('on0', True)#change to false for comp 
+        on1 = visionTable.getBoolean('on1', False)
         ret = False
 
         if on0:
@@ -107,9 +144,11 @@ def run_network():
             print(img)
             print(result)
 
-            tables.putString('values', result)
+            valuesPub.set()
+            #tables.putString('values', result)
 
             print(tables)
+    
 
             
             

@@ -3,15 +3,16 @@
 # An object of Flask class is our WSGI application.
 from flask import Flask, Response
 import cv2
-from networktables import NetworkTables
+import ntcore 
 import threading
 from datetime import datetime
 import os
-from yoloProcces import process, draw_bounding_box
+import apriltag 
 import numpy as np
 
 # Flask constructor takes the name of c
 # declares cameras and set video type
+app = Flask(__name__)
 cam0 = cv2.VideoCapture(0)
 cam1 = cv2.VideoCapture(1) 
 fourcc = cv2.VideoWriter_fourcc(*'XVID') 
@@ -19,24 +20,25 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # declares NetworkTables and set server address and tables
 # default port for network tables = 1735
 serverAddr = '10.10.38.2'
-NetworkTables.initialize(server=serverAddr)
-tables = NetworkTables.getTable('Vision')
-# fmsTable = NetworkTables.getTable('FMSInfo') #uncomment for competition
-
+instance = ntcore.NetworkTableInstance.getDefault(0)
+visionTable = instance.getTable('vision')
+fmsTable = instance.getTable('FMSInfo') #uncomment for competition
+shouldStream0Sub = visionTable.getBooleanTopic("ShouldStream0").subscribe(True)
 
 # The get_image() method returns image from camera
 def get_image():
     ret, img = cam0.read()
 
     while True:
-        shouldStream0 = tables.getBoolean('shouldStream0', True)
+        shouldStream0 =shouldStream0Sub.get()
 
         if(shouldStream0):
             ret, img = cam0.read()
         else:
             ret, img = cam1.read()
         
-        
+        if not ret:
+            continue
         img = cv2.resize(img, (0, 0), fx = 0.33, fy = 0.33)
         # Converts (encodes) image formats into streaming data and stores it in-memory cache.
         frame = cv2.imencode('.jpg', img)[1]
@@ -81,10 +83,12 @@ def hsv_Detection(img):
 def record_cam():
     print("Recording ...")
     isRecording = False
-
+    shouldRecordSub = visionTable.getBooleanTopic("shouldRecord").subscribe(True)
+    matchIDSub = fmsTable.getIntegerTopic("MatchNumber").subscribe(0)
+    rematchIDSub = fmsTable.getIntegerTopic("ReplayNumber").subscribe(0)
     while True:
         realTime = datetime.now()
-        shouldRecord = tables.getBoolean('recording', False)
+        shouldRecord = shouldRecordSub.get()
 
         if shouldRecord:
             ret0, img0 = cam0.read()
@@ -92,8 +96,8 @@ def record_cam():
 
             if not isRecording:
                 # uncomment following 3 lines for competition
-                #matchID = fmsTable.getNumber('MatchNumber', 0)
-                #rematchID = fmsTable.getNumebr('ReplayNumber', 0)
+                #matchID = matchIDSub.get()
+                #rematchID = rematchIDSub.get()
                 #out = cv2.VideoWriter(str(matchID) + '-' + str(rematchID) + '.avi', fourcc, 60.0, (img.shape[1], img.shape[0]))
                 if ret0:
                     out0 = cv2.VideoWriter(f"{os.path.expanduser('~')}/Videos/{realTime.strftime('%Y-%m-%d at %H-%M-%S')} cam0.avi", fourcc, 15.0, (img0.shape[1], img0.shape[0]))
@@ -118,9 +122,11 @@ def record_cam():
 # The run_network() method sets network table with image data
 def run_network():
     print('running network table ...')
+    detector = apriltag.Detector()
+   
     while True:
-        on0 = tables.getBoolean('on0', True)#change to false for comp 
-        on1 = tables.getBoolean('on1', False)
+        on0 = visionTable.getBoolean('on0', True)#change to false for comp 
+        on1 = visionTable.getBoolean('on1', False)
         ret = False
 
         if on0:
@@ -128,7 +134,7 @@ def run_network():
         elif on1:
             ret, img = cam1.read()
 
-        '''if ret:
+         '''if ret:
             print('time to process images.')
             img, vals = process(img)
 
@@ -138,6 +144,7 @@ def run_network():
             tables.putString('values', vals)
 
             print(tables)'''
+    
 
             
             

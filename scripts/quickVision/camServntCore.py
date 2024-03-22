@@ -4,7 +4,7 @@
 from flask import Flask, Response
 import cv2
 #from networktables import NetworkTables
-import ntcore
+from ntcore import NetworkTableInstance
 import threading
 from datetime import datetime
 import os
@@ -21,8 +21,8 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # declares NetworkTables and set server address and tables
 # default port for network tables = 1735
 serverAddr = '10.10.38.2'
-dTable = ntcore.NetworkTableInstance.getDefault()
-tables = dTable.getTable('vision')
+instance = ntcore.NetworkTableInstance.getDefault()
+tables = instance.getTable('vision')
 #NetworkTables.initialize(server=serverAddr)
 #tables = NetworkTables.getTable('Vision')
 # fmsTable = NetworkTables.getTable('FMSInfo') #uncomment for competition
