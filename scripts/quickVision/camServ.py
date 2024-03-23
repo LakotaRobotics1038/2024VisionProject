@@ -9,6 +9,7 @@ import threading
 from datetime import datetime
 import os
 import apriltag 
+import json
 import numpy as np
 
 # Flask constructor takes the name of c
@@ -21,10 +22,15 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # declares NetworkTables and set server address and tables
 # default port for network tables = 1735
 serverAddr = '10.10.38.2'
-instance = ntcore.NetworkTableInstance.getDefault(0)
+instance = ntcore.NetworkTableInstance.getDefault()
 visionTable = instance.getTable('vision')
 fmsTable = instance.getTable('FMSInfo') #uncomment for competition
+
 shouldStream0Sub = visionTable.getBooleanTopic("ShouldStream0").subscribe(True)
+valuesPub= visionTable.getStringTopic("values").publish()
+
+
+dataOut = [] # this is what stuff with be appended into for network tables publishing
 
 # The get_image() method returns image from camera
 def get_image():
@@ -79,28 +85,32 @@ def hsv_Detection(img):
 
     #find avg for total x + y to find center of contour
     if bc is not None:
-        i=0
+        n=0 #n = the number of iterations the loop below has been through
         totalX=0
         totalY=0
-        for i in range(0,len(contours0[bc])):
-            xyCoord = str(contours0[bc][i])
-
-            firstSpace = xyCoord.index(' ')
-            lastSpace = xyCoord.rfind(' ')
-
-            xCoord = xyCoord[2:firstSpace]
-            yCoord = xyCoord[(lastSpace+1):(len(xyCoord)-2)]
-
-            totalX += int(xCoord)
-            totalY += int(yCoord)
+        x_values = []
+        y_values = []
         
-        avgX = totalX/(i-1)
-        avgY = totalY/(i-1)
+        for i in range(len(contours0[bc])):
 
+            xyCoord = contours0[bc][i][0]
+            x_values.append(xyCoord[0])
+            y_values.append(xyCoord[1])
 
-            
-     
+        center_x = int((max(x_values) - min(x_values)) / 2 + min(x_values))
+        center_y = int((max(y_values) - min(y_values)) / 2 + min(y_values)) 
+        
+        centerPoint = [center_x,center_y]
 
+        dataOut = []
+        dataOut.append({
+            'id': str(17),
+            'center': str(centerPoint),
+            'corners': str(None)
+        })
+
+        valuesPub.set(json.dumps(dataOut))
+        #print(img) 
 
 # The record_cam() method records images from camera
 def record_cam():
@@ -109,6 +119,7 @@ def record_cam():
     shouldRecordSub = visionTable.getBooleanTopic("shouldRecord").subscribe(True)
     matchIDSub = fmsTable.getIntegerTopic("MatchNumber").subscribe(0)
     rematchIDSub = fmsTable.getIntegerTopic("ReplayNumber").subscribe(0)
+
     while True:
         realTime = datetime.now()
         shouldRecord = shouldRecordSub.get()
@@ -118,7 +129,7 @@ def record_cam():
             ret1, img1 = cam1.read()
 
             if not isRecording:
-                # uncomment following 3 lines for competition
+                #uncomment following 3 lines for competition
                 #matchID = matchIDSub.get()
                 #rematchID = rematchIDSub.get()
                 #out = cv2.VideoWriter(str(matchID) + '-' + str(rematchID) + '.avi', fourcc, 60.0, (img.shape[1], img.shape[0]))
@@ -146,7 +157,7 @@ def record_cam():
 def run_network():
     print('running network table ...')
     detector = apriltag.Detector()
-    valuesPub= visionTable.getStringTopic("values").publish("[]")
+
     while True:
         on0 = visionTable.getBoolean('on0', True)#change to false for comp 
         on1 = visionTable.getBoolean('on1', False)
@@ -158,15 +169,20 @@ def run_network():
             ret, img = cam1.read()
 
         if ret:
-            print('time to process images.')
+            #print('time to process images.')
             
             result = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
+            
+            if len(result) != 0:
+                dataOut=[]
+                dataOut.append({
+                    'id': str(result[0][1]),
+                    'center': str(result[0][6]),
+                    'corners': str(result[0][7])
+                })
 
-            print(img)
-            print(result)
-
-            valuesPub.set()
-            #tables.putString('values', result)
+                valuesPub.set(json.dumps(dataOut))
+            
 
             print(visionTable)
     

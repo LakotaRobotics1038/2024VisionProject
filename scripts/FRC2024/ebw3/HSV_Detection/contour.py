@@ -64,10 +64,13 @@ while True:
         totalY=0
         x_values = []
         y_values = []
+        
         for i in range(len(contours0[bc])):
+
             xyCoord = contours0[bc][i][0]
             x_values.append(xyCoord[0])
             y_values.append(xyCoord[1])
+
         center_x = int((max(x_values) - min(x_values)) / 2 + min(x_values))
         center_y = int((max(y_values) - min(y_values)) / 2 + min(y_values)) 
         img = cv2.circle(img, (center_x, center_y), 15, (0, 0, 255), -1) 
