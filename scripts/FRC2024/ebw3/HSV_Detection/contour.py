@@ -1,11 +1,12 @@
 import cv2
 import numpy as np
+import math
 
 def nothing(n):
     pass
 
 # Contours w/ greatest number of points
-# TODO max by area
+#TOdo max by area
 def biggestContourI(contours):
     maxVal = 0
     maxI = None
@@ -57,9 +58,33 @@ while True:
     # Only draw the biggest one
 
     bc = biggestContourI(contours0)
-    if(bc != None):
-        print("new contour" + str(contours0[bc][0]))
+    '''if(bc != None):
+        print("new contour" + str(contours0[bc][0]))'''
     cv2.drawContours(img, contours0, bc, (0,255,0), 3)
+
+    if bc is not None:
+        n=0 #n = the number of iterations the loop below has been through
+        totalX=0
+        totalY=0
+        for i in range(0,len(contours0[bc])):
+            xyCoord = str(contours0[bc][i])
+
+            firstSpace = xyCoord.index(' ')
+            lastSpace = xyCoord.rfind(' ')
+
+            xCoord = xyCoord[2:firstSpace]
+            yCoord = xyCoord[(lastSpace+1):(len(xyCoord)-2)]
+
+            totalX =+ int(xCoord)
+            totalY =+ int(yCoord)
+            n =+ 1
+        avgX = totalX/n
+        avgY = totalY/n
+
+        #img = cv2.circle(img, (math.floor(avgX), math.floor(avgY)), 5, (0, 0, 255), -1) 
+        img = cv2.circle(img, (100, 100), 5, (0, 0, 255), -1) 
+        #print(avgX,  avgY)
+
     
     cv2.imshow('cam', img)
     cv2.imshow('hsv', hsv)
