@@ -5,7 +5,7 @@ def nothing(n):
     pass
 
 # Contours w/ greatest number of points
-# TODO max by area
+#TOdo max by area
 def biggestContourI(contours):
     maxVal = 0
     maxI = None
@@ -33,7 +33,7 @@ cv2.createTrackbar("HighS", "Control", iHighS, 255, nothing)
 cv2.createTrackbar("LowV", "Control", iLowV, 255, nothing)
 cv2.createTrackbar("HighV", "Control", iHighV, 255, nothing)
 
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(1)
 
 while True:
     ret_val, img = cam.read()
@@ -53,13 +53,28 @@ while True:
     flt = cv2.inRange(hsv, lower, higher)
     
     contours0, hierarchy = cv2.findContours(flt, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
     # Only draw the biggest one
 
     bc = biggestContourI(contours0)
-    if(bc != None):
-        print("new contour" + str(contours0[bc][0]))
-    cv2.drawContours(img, contours0, bc, (0,255,0), 3)
+    cv2.drawContours(img, contours0, bc, (0, 255, 0), 3)
+
+    if bc is not None:
+        n=0 #n = the number of iterations the loop below has been through
+        totalX=0
+        totalY=0
+        x_values = []
+        y_values = []
+        
+        for i in range(len(contours0[bc])):
+
+            xyCoord = contours0[bc][i][0]
+            x_values.append(xyCoord[0])
+            y_values.append(xyCoord[1])
+
+        center_x = int((max(x_values) - min(x_values)) / 2 + min(x_values))
+        center_y = int((max(y_values) - min(y_values)) / 2 + min(y_values)) 
+        img = cv2.circle(img, (center_x, center_y), 15, (0, 0, 255), -1) 
+
     
     cv2.imshow('cam', img)
     cv2.imshow('hsv', hsv)
