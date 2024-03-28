@@ -33,7 +33,7 @@ cv2.createTrackbar("HighS", "Control", iHighS, 255, nothing)
 cv2.createTrackbar("LowV", "Control", iLowV, 255, nothing)
 cv2.createTrackbar("HighV", "Control", iHighV, 255, nothing)
 
-cam = cv2.VideoCapture(1)
+cam = cv2.VideoCapture(0)
 
 while True:
     ret_val, img = cam.read()

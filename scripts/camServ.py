@@ -1,4 +1,3 @@
-
 # Importing flask module in the project is mandatory
 # An object of Flask class is our WSGI application.
 from flask import Flask, Response
@@ -8,6 +7,7 @@ import threading
 from datetime import datetime
 import os
 import apriltag 
+import json
 import numpy as np
 
 # Flask constructor takes the name of c
@@ -20,10 +20,15 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # declares NetworkTables and set server address and tables
 # default port for network tables = 1735
 serverAddr = '10.10.38.2'
-instance = ntcore.NetworkTableInstance.getDefault(0)
+instance = ntcore.NetworkTableInstance.getDefault()
 visionTable = instance.getTable('vision')
 fmsTable = instance.getTable('FMSInfo') #uncomment for competition
+
 shouldStream0Sub = visionTable.getBooleanTopic("ShouldStream0").subscribe(True)
+valuesPub= visionTable.getStringTopic("values").publish()
+
+
+dataOut = [] # this is what stuff with be appended into for network tables publishing
 
 # The get_image() method returns image from camera
 def get_image():
@@ -39,6 +44,7 @@ def get_image():
         
         if not ret:
             continue
+        
         img = cv2.resize(img, (0, 0), fx = 0.33, fy = 0.33)
         # Converts (encodes) image formats into streaming data and stores it in-memory cache.
         frame = cv2.imencode('.jpg', img)[1]
@@ -72,20 +78,46 @@ def hsv_Detection(img):
     contours0, _ = cv2.findContours(flt, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Only draw the biggest one
+  
     bc = biggestContourI(contours0)
-   
-    
-   
-     
+    cv2.drawContours(img, contours0, bc, (0, 255, 0), 3)
 
+    #find avg for total x + y to find center of contour
+    if bc is not None:
+        x_values = []
+        y_values = []
+        
+        for i in range(len(contours0[bc])):
+
+            xyCoord = contours0[bc][i][0]
+            x_values.append(xyCoord[0])
+            y_values.append(xyCoord[1])
+
+        center_x = int((max(x_values) - min(x_values)) / 2 + min(x_values))
+        center_y = int((max(y_values) - min(y_values)) / 2 + min(y_values)) 
+        img = cv2.circle(img, (center_x, center_y), 15, (0, 0, 255), -1) 
+        centerPoint = [center_x,center_y]
+
+        dataOut = []
+        dataOut.append({
+            'id': str(17),
+            'center': str(centerPoint),
+            'corners': str("")
+        })
+
+        valuesPub.set(json.dumps(dataOut))
+        print(str(dataOut))
+        print(f"Size: {max(x_values) - min(x_values)}, {max(y_values) - min(y_values)}")
+        
 
 # The record_cam() method records images from camera
 def record_cam():
-    print("Recording ...")
+    #print("Recording ...")
     isRecording = False
     shouldRecordSub = visionTable.getBooleanTopic("shouldRecord").subscribe(True)
     matchIDSub = fmsTable.getIntegerTopic("MatchNumber").subscribe(0)
     rematchIDSub = fmsTable.getIntegerTopic("ReplayNumber").subscribe(0)
+
     while True:
         realTime = datetime.now()
         shouldRecord = shouldRecordSub.get()
@@ -95,16 +127,16 @@ def record_cam():
             ret1, img1 = cam1.read()
 
             if not isRecording:
-                # uncomment following 3 lines for competition
+                #uncomment following 3 lines for competition
                 #matchID = matchIDSub.get()
                 #rematchID = rematchIDSub.get()
                 #out = cv2.VideoWriter(str(matchID) + '-' + str(rematchID) + '.avi', fourcc, 60.0, (img.shape[1], img.shape[0]))
                 if ret0:
                     out0 = cv2.VideoWriter(f"{os.path.expanduser('~')}/Videos/{realTime.strftime('%Y-%m-%d at %H-%M-%S')} cam0.avi", fourcc, 15.0, (img0.shape[1], img0.shape[0]))
-                    print(out0)
+                    #print(out0)
                 if ret1:
                     out1 = cv2.VideoWriter(f"{os.path.expanduser('~')}/Videos/{realTime.strftime('%Y-%m-%d at %H-%M-%S')} cam1.avi", fourcc, 15.0, (img1.shape[1], img1.shape[0]))
-                    print(out1)
+                    #print(out1)
 
             if ret0:
                 out0.write(img0)
@@ -121,9 +153,9 @@ def record_cam():
 
 # The run_network() method sets network table with image data
 def run_network():
-    print('running network table ...')
+    #print('running network table ...')
     detector = apriltag.Detector()
-   
+
     while True:
         on0 = visionTable.getBoolean('on0', True)#change to false for comp 
         on1 = visionTable.getBoolean('on1', False)
@@ -133,17 +165,28 @@ def run_network():
             ret, img = cam0.read()
         elif on1:
             ret, img = cam1.read()
+        if ret:
+            hsv_Detection(img)
+            #print('time to process images.')
+            
+            result = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
+            
+            if len(result) != 0:
+                dataOut=[]
+                dataOut.append({
+                    'id': str(result[0][1]),
+                    'center': str(result[0][6]),
+                    'corners': str(result[0][7])
+                })
 
-        '''if ret:
-            print('time to process images.')
-            img, vals = process(img)
+                valuesPub.set(json.dumps(dataOut))
+                print(str(dataOut))
 
-            print(img)
-            print(vals)
+            # id and corners are for april tags only
+            # center is for the notes/rings only
 
-            tables.putString('values', vals)
-
-            print(tables)'''
+            #print(visionTable)
+            #print(result)
     
 
             

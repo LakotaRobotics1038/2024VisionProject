@@ -17,3 +17,11 @@
 ## Boot GUI for one-time use
 
 `startx`
+
+## Stopping the service
+
+`sudo systemctl stop vision1038`
+
+## Starting the service
+
+`sudo systemctl start vision1038`
