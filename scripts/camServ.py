@@ -166,7 +166,7 @@ def run_network():
         elif on1:
             ret, img = cam1.read()
         if ret:
-            #hsv_Detection(img)
+            hsv_Detection(img)
             #print('time to process images.')
             
             result = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
