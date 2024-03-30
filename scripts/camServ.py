@@ -171,13 +171,13 @@ def run_network():
             ret, img = cam1.read()
 
         if ret:
+            dataOut=[]
             #hsv_Detection(img)
             #print('time to process images.')
 
             result = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
 
             if len(result) != 0:
-                dataOut=[]
                 dataOut.append({
                     'id': str(result[0][1]),
                     'x': str(result[0][6][0]),
@@ -185,23 +185,16 @@ def run_network():
                     'corners': str(result[0][7])
                 })
 
-                valuesPub.set(json.dumps(dataOut))
                 print(str(dataOut))
 
+            valuesPub.set(json.dumps(dataOut))
             # id and corners are for april tags only
             # center is for the notes/rings only
-
-            #print(visionTable)
-            #print(result)
-
-
-
 
 # The route() function of the Flask class is a decorator,
 # which tells the application which URL should call
 # the associated function.
 @app.route('/stream')
-# ‘/’ URL is bound with hello_world() function.
 def stream0():
     return Response(get_image(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
