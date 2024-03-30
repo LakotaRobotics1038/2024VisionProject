@@ -2,11 +2,11 @@
 # An object of Flask class is our WSGI application.
 from flask import Flask, Response
 import cv2
-import ntcore 
+import ntcore
 import threading
 from datetime import datetime
 import os
-import apriltag 
+import apriltag
 import json
 import numpy as np
 
@@ -14,19 +14,18 @@ import numpy as np
 # declares cameras and set video type
 app = Flask(__name__)
 cam0 = cv2.VideoCapture(0)
-cam1 = cv2.VideoCapture(1) 
-fourcc = cv2.VideoWriter_fourcc(*'XVID') 
+cam1 = cv2.VideoCapture(1)
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
 
 # declares NetworkTables and set server address and tables
 # default port for network tables = 1735
-serverAddr = '10.10.38.2'
 instance = ntcore.NetworkTableInstance.getDefault()
 visionTable = instance.getTable('vision')
 fmsTable = instance.getTable('FMSInfo') #uncomment for competition
 
 shouldStream0Sub = visionTable.getBooleanTopic("ShouldStream0").subscribe(True)
-valuesPub= visionTable.getStringTopic("values").publish()
-
+enableSub = visionTable.getBooleanTopic("enable").subscribe(False)
+valuesPub = visionTable.getStringTopic("values").publish()
 
 dataOut = [] # this is what stuff with be appended into for network tables publishing
 
@@ -35,19 +34,20 @@ def get_image():
     ret, img = cam0.read()
 
     while True:
-        shouldStream0 =shouldStream0Sub.get()
+        shouldStream0 = shouldStream0Sub.get()
 
         if(shouldStream0):
+
             ret, img = cam0.read()
         else:
             ret, img = cam1.read()
-        
+
         if not ret:
             continue
-        
-        img = cv2.resize(img, (0, 0), fx = 0.33, fy = 0.33)
+
+        img = cv2.resize(img, (160, 120))
         # Converts (encodes) image formats into streaming data and stores it in-memory cache.
-        frame = cv2.imencode('.jpg', img)[1]
+        _, frame = cv2.imencode('.jpg', img)
 
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
 
@@ -61,7 +61,7 @@ def biggestContourI(contours):
     return maxI
 
 def hsv_Detection(img):
-    
+
     lh = 1
     ls = 122
     lv = 199
@@ -71,14 +71,14 @@ def hsv_Detection(img):
 
     lower = np.array([lh, ls, lv], dtype = "uint8")
     higher = np.array([hh, hs, hv], dtype = "uint8")
-    
+
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     flt = cv2.inRange(hsv, lower, higher)
-    
+
     contours0, _ = cv2.findContours(flt, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Only draw the biggest one
-  
+
     bc = biggestContourI(contours0)
     cv2.drawContours(img, contours0, bc, (0, 255, 0), 3)
 
@@ -86,7 +86,7 @@ def hsv_Detection(img):
     if bc is not None:
         x_values = []
         y_values = []
-        
+
         for i in range(len(contours0[bc])):
 
             xyCoord = contours0[bc][i][0]
@@ -94,8 +94,8 @@ def hsv_Detection(img):
             y_values.append(xyCoord[1])
 
         center_x = int((max(x_values) - min(x_values)) / 2 + min(x_values))
-        center_y = int((max(y_values) - min(y_values)) / 2 + min(y_values)) 
-        img = cv2.circle(img, (center_x, center_y), 15, (0, 0, 255), -1) 
+        center_y = int((max(y_values) - min(y_values)) / 2 + min(y_values))
+        img = cv2.circle(img, (center_x, center_y), 15, (0, 0, 255), -1)
         centerPoint = [center_x,center_y]
 
         dataOut = []
@@ -108,7 +108,7 @@ def hsv_Detection(img):
         valuesPub.set(json.dumps(dataOut))
         print(str(dataOut))
         print(f"Size: {max(x_values) - min(x_values)}, {max(y_values) - min(y_values)}")
-        
+
 
 # The record_cam() method records images from camera
 def record_cam():
@@ -157,20 +157,21 @@ def run_network():
     detector = apriltag.Detector()
 
     while True:
-        on0 = visionTable.getBoolean('on0', True)#change to false for comp 
-        on1 = visionTable.getBoolean('on1', False)
+        enabled = enableSub.get()
+        shouldStream0 = shouldStream0Sub.get()
         ret = False
 
-        if on0:
+        if enabled and shouldStream0:
             ret, img = cam0.read()
-        elif on1:
+        elif enabled and not shouldStream0:
             ret, img = cam1.read()
+
         if ret:
             #hsv_Detection(img)
             #print('time to process images.')
-            
+
             result = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
-            
+
             if len(result) != 0:
                 dataOut=[]
                 dataOut.append({
@@ -187,18 +188,18 @@ def run_network():
 
             #print(visionTable)
             #print(result)
-    
 
-            
-            
-# The route() function of the Flask class is a decorator, 
-# which tells the application which URL should call 
+
+
+
+# The route() function of the Flask class is a decorator,
+# which tells the application which URL should call
 # the associated function.
 @app.route('/stream')
 # ‘/’ URL is bound with hello_world() function.
 def stream0():
     return Response(get_image(), mimetype='multipart/x-mixed-replace; boundary=frame')
- 
+
 # main driver function
 if __name__ == '__main__':
     # Declare, initialize and start the vision process thread
@@ -208,8 +209,8 @@ if __name__ == '__main__':
     # Declare, initialize and start the recording process thread
     #recordingThread = threading.Thread(target=record_cam)
     #recordingThread.start()
- 
-    # run() method of Flask class runs the application 
+
+    # run() method of Flask class runs the application
     # on the local development server.
     app.run(host='0.0.0.0', port = 1180, threaded=True)
 
