@@ -7,7 +7,7 @@ After=multi-user.target
 User=jetson
 Type=simple
 WorkingDirectory=/home/jetson/workspace/2024VisionProject/scripts
-ExecStart=/usr/bin/python3.8 /home/jetson/workspace/2024VisionProject/scripts/quickVision/camServ.py
+ExecStart=/usr/bin/python3.8 /home/jetson/workspace/2024VisionProject/scripts/camServ.py
 Restart=on-abort
 
 [Install]
