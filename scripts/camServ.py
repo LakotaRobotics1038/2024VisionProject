@@ -49,7 +49,7 @@ def get_image():
         if not ret:
             continue
 
-        img = cv2.resize(img, (160, 120))
+        img = cv2.resize(img, (320, 180))
         # Converts (encodes) image formats into streaming data and stores it in-memory cache.
         _, frame = cv2.imencode('.jpg', img)
 
@@ -175,6 +175,7 @@ def run_network():
             #hsv_Detection(img)
             #print('time to process images.')
 
+            img = cv2.resize(img, (320, 180))
             result = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
 
             if len(result) != 0:
