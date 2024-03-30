@@ -180,7 +180,8 @@ def run_network():
                 dataOut=[]
                 dataOut.append({
                     'id': str(result[0][1]),
-                    'center': str(result[0][6]),
+                    'x': str(result[0][6][0]),
+                    'y': str(result[0][6][1]),
                     'corners': str(result[0][7])
                 })
 
