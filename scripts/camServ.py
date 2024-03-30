@@ -2,7 +2,7 @@
 # An object of Flask class is our WSGI application.
 from flask import Flask, Response
 import cv2
-import ntcore
+from ntcore import NetworkTableInstance
 import threading
 from datetime import datetime
 import os
@@ -19,9 +19,13 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 
 # declares NetworkTables and set server address and tables
 # default port for network tables = 1735
-instance = ntcore.NetworkTableInstance.getDefault()
-visionTable = instance.getTable('vision')
-fmsTable = instance.getTable('FMSInfo') #uncomment for competition
+instance = NetworkTableInstance.getDefault()
+
+visionTable = instance.getTable('Vision')
+fmsTable = instance.getTable('FMSInfo')
+
+instance.startClient4("Vision Client")
+instance.setServerTeam(1038)
 
 shouldStream0Sub = visionTable.getBooleanTopic("ShouldStream0").subscribe(True)
 enableSub = visionTable.getBooleanTopic("enable").subscribe(False)
