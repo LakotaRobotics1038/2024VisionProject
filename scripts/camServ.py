@@ -185,7 +185,7 @@ def run_network():
                     'corners': str(result[0][7])
                 })
 
-                print(str(dataOut))
+                # print(str(dataOut))
 
             valuesPub.set(json.dumps(dataOut))
             # id and corners are for april tags only
