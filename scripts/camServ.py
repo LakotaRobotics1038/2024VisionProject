@@ -28,7 +28,8 @@ instance.startClient4("Vision Client")
 instance.setServerTeam(1038)
 
 shouldStream0Sub = visionTable.getBooleanTopic("ShouldStream0").subscribe(True)
-enableSub = visionTable.getBooleanTopic("enable").subscribe(False)
+enable0Sub = visionTable.getBooleanTopic("enable0").subscribe(False)
+enable1Sub = visionTable.getBooleanTopic("enable1").subscribe(False)
 valuesPub = visionTable.getStringTopic("values").publish()
 
 dataOut = [] # this is what stuff with be appended into for network tables publishing
@@ -161,13 +162,13 @@ def run_network():
     detector = apriltag.Detector()
 
     while True:
-        enabled = enableSub.get()
-        shouldStream0 = shouldStream0Sub.get()
+        enabled0 = enable0Sub.get()
+        enabled1 = enable1Sub.get()
         ret = False
 
-        if enabled and shouldStream0:
+        if enabled0:
             ret, img = cam0.read()
-        elif enabled and not shouldStream0:
+        elif enabled1:
             ret, img = cam1.read()
 
         if ret:
