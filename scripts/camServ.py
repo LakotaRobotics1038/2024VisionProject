@@ -181,10 +181,10 @@ def run_network():
 
             if len(result) != 0:
                 dataOut.append({
-                    'id': str(result[0][1]),
-                    'x': str(result[0][6][0]),
-                    'y': str(result[0][6][1]),
-                    'corners': str(result[0][7])
+                    'id': str(result[0].tag_id),
+                    'x': str(result[0].center[0]),
+                    'y': str(result[0].center[1]),
+                    'corners': str(result[0].corners)
                 })
 
                 # print(str(dataOut))
