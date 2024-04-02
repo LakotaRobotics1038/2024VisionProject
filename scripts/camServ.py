@@ -159,9 +159,8 @@ def record_cam():
 # The run_network() method sets network table with image data
 def run_network():
     #print('running network table ...')
-    detector = apriltag.Detector(
-        families='tag36h11',
-    )
+    detector = apriltag.Detector()
+
 
     while True:
         enabled0 = enable0Sub.get()
