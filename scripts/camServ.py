@@ -161,6 +161,15 @@ def run_network():
     #print('running network table ...')
     detector = apriltag.Detector()
 
+    focal_length_x = 982.9241683945954
+    focal_length_y = 983.2638871003754
+    principal_point_x = 621.0138331862919
+    principal_point_y = 371.30941929188356
+
+    # Load camera parameters
+    camera_matrix = np.array([[focal_length_x, 0, principal_point_x],
+        [0, focal_length_y, principal_point_y],
+        [0, 0, 1]])
 
     while True:
         enabled0 = enable0Sub.get()
@@ -177,10 +186,23 @@ def run_network():
             #hsv_Detection(img)
             #print('time to process images.')
 
-            img = cv2.resize(img, (320, 180))
             tags = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
 
             for tag in tags:
+                # Get the homography matrix
+                H = tag.homography
+
+                # Calculate the rotation matrix from the homography matrix
+                R = np.linalg.inv(camera_matrix) @ H
+
+                # Extract rotation angle
+                theta = np.arctan2(R[1, 0], R[0, 0])
+
+                # Convert radians to degrees
+                angle_degrees = np.degrees(theta)
+
+                print(f'SEE {tag.tag_id}: {angle_degrees}')
+
                 dataOut.append({
                     'id': str(tag.tag_id),
                     'x': str(tag.center[0]),
