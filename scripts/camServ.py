@@ -159,7 +159,9 @@ def record_cam():
 # The run_network() method sets network table with image data
 def run_network():
     #print('running network table ...')
-    detector = apriltag.Detector()
+    detector = apriltag.Detector(
+        families='tag36h11',
+    )
 
     while True:
         enabled0 = enable0Sub.get()
@@ -177,17 +179,17 @@ def run_network():
             #print('time to process images.')
 
             img = cv2.resize(img, (320, 180))
-            result = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
+            tags = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
 
-            if len(result) != 0:
+            for tag in tags:
                 dataOut.append({
-                    'id': str(result[0].tag_id),
-                    'x': str(result[0].center[0]),
-                    'y': str(result[0].center[1]),
-                    'corners': str(result[0].corners)
+                    'id': str(tag.tag_id),
+                    'x': str(tag.center[0]),
+                    'y': str(tag.center[1]),
+                    'corners': str(tag.corners)
                 })
 
-                # print(str(dataOut))
+            # print(str(dataOut))
 
             valuesPub.set(json.dumps(dataOut))
             # id and corners are for april tags only
