@@ -101,13 +101,13 @@ def hsv_Detection(img):
         center_x = int((max(x_values) - min(x_values)) / 2 + min(x_values))
         center_y = int((max(y_values) - min(y_values)) / 2 + min(y_values))
         img = cv2.circle(img, (center_x, center_y), 15, (0, 0, 255), -1)
-        centerPoint = [center_x,center_y]
 
         dataOut = []
         dataOut.append({
-            'id': str(17),
-            'center': str(centerPoint),
-            'corners': str("")
+            'id': str(0),
+            'x': center_x,
+            'y': center_y,
+            'corners': str("[]")
         })
 
         valuesPub.set(json.dumps(dataOut))
