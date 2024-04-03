@@ -167,9 +167,7 @@ def run_network():
     principal_point_y = 371.30941929188356
 
     # Load camera parameters
-    camera_matrix = np.array([[focal_length_x, 0, principal_point_x],
-        [0, focal_length_y, principal_point_y],
-        [0, 0, 1]])
+    K = np.array([[focal_length_x, 0, principal_point_x], [0, focal_length_y, principal_point_y], [0, 0, 1]])
 
     while True:
         enabled0 = enable0Sub.get()
@@ -192,16 +190,14 @@ def run_network():
                 # Get the homography matrix
                 H = tag.homography
 
-                # Calculate the rotation matrix from the homography matrix
-                R = np.linalg.inv(camera_matrix) @ H
+                _, Rs, Ts, _ = cv2.decomposeHomographyMat(H, K)
 
-                # Extract rotation angle
-                theta = np.arctan2(R[1, 0], R[0, 0])
+                R = Rs[0]
+                T = Ts[0]
 
-                # Convert radians to degrees
-                angle_degrees = np.degrees(theta)
+                test = cv2.RQDecomp3x3(R)
 
-                print(f'SEE {tag.tag_id}: {angle_degrees}')
+                print(f"Tag: {tag.tag_id}; Rotation {test[0]}")
 
                 dataOut.append({
                     'id': str(tag.tag_id),
