@@ -28,7 +28,7 @@ instance.startClient4("Vision Client")
 instance.setServerTeam(1038)
 
 shouldStream0Sub = visionTable.getBooleanTopic("ShouldStream0").subscribe(True)
-enable0Sub = visionTable.getBooleanTopic("enable0").subscribe(False)
+enable0Sub = visionTable.getBooleanTopic("enable0").subscribe(True) #set defualt to false for comp
 enable1Sub = visionTable.getBooleanTopic("enable1").subscribe(False)
 valuesPub = visionTable.getStringTopic("values").publish()
 
@@ -166,8 +166,10 @@ def run_network():
     principal_point_x = 621.0138331862919
     principal_point_y = 371.30941929188356
 
+    camera_param = [focal_length_x, focal_length_y, principal_point_x, principal_point_y]
+
     # Load camera parameters
-    K = np.array([[focal_length_x, 0, principal_point_x], [0, focal_length_y, principal_point_y], [0, 0, 1]])
+    K_Matrix = np.array([[focal_length_x, 0, principal_point_x], [0, focal_length_y, principal_point_y], [0, 0, 1]])
 
     while True:
         enabled0 = enable0Sub.get()
@@ -176,6 +178,7 @@ def run_network():
 
         if enabled0:
             ret, img = cam0.read()
+
         elif enabled1:
             ret, img = cam1.read()
 
@@ -187,13 +190,24 @@ def run_network():
             tags = detector.detect(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY))
 
             for tag in tags:
-                # Get the homography matrix
+                #https://github.com/FRC-Team-3140/sensors3140/blob/main/python/sensors3140/apriltag/__main__.py
+                pose = detector.detection_pose(tag,camera_param,0.16)
+
+                trans = pose[0][0:3,3]
+
+                tagFamily = tag.tag_family.decode("utf-8")
+                dist = np.sqrt((trans**2).sum())
+                bearing = np.arctan2(trans[0],trans[2]) * 180.0 / np.pi
+                azimuth = np.arctan2(-trans[1],trans[2]) * 180.0 / np.pi
+
+
+                # Get the homography matrix #shame griffin :((
                 H = tag.homography
 
-                _, Rs, Ts, _ = cv2.decomposeHomographyMat(H, K)
+                _, rotations, translations, _ = cv2.decomposeHomographyMat(H, K_Matrix)
 
-                R = Rs[0]
-                T = Ts[0]
+                R = rotations[0]
+                T = translations[0]
 
                 test = cv2.RQDecomp3x3(R)
 
@@ -205,6 +219,11 @@ def run_network():
                     'y': str(tag.center[1]),
                     'corners': str(tag.corners)
                 })
+
+                print("Tag: " + str(tag.tag_id))
+                print("Distance: " + str(dist))
+                print("Bearing: " + str(bearing))
+                print("Elevation: " + str(azimuth))
 
             # print(str(dataOut))
 
@@ -224,6 +243,8 @@ if __name__ == '__main__':
     # Declare, initialize and start the vision process thread
     visionThread = threading.Thread(target=run_network)
     visionThread.start()
+
+
 
     # Declare, initialize and start the recording process thread
     #recordingThread = threading.Thread(target=record_cam)
