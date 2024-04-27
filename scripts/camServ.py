@@ -107,7 +107,8 @@ def hsv_Detection(img):
             'id': str(0),
             'x': center_x,
             'y': center_y,
-            'corners': str("[]")
+            'corners': str("[]"),
+            'bearing' : str(0)
         })
 
         valuesPub.set(json.dumps(dataOut))
@@ -217,7 +218,8 @@ def run_network():
                     'id': str(tag.tag_id),
                     'x': str(tag.center[0]),
                     'y': str(tag.center[1]),
-                    'corners': str(tag.corners)
+                    'corners': str(tag.corners),
+                    'bearing' : str(bearing)
                 })
 
                 print("Tag: " + str(tag.tag_id))
